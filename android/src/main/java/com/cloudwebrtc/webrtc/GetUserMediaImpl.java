@@ -445,7 +445,7 @@ class GetUserMediaImpl{
                     return;
                 }
 
-                MediaStreamTrack[] tracks = new MediaStreamTrack[1];
+                MediaStreamTrack[] tracks = new MediaStreamTrack[2];
                 VideoCapturer videoCapturer = null;
                 videoCapturer = new ScreenCapturerAndroid(mediaProjectionData, new MediaProjection.Callback() {
                     @Override
@@ -477,6 +477,8 @@ class GetUserMediaImpl{
                     mVideoCapturers.put(trackId, videoCapturer);
 
                     tracks[0] = pcFactory.createVideoTrack(trackId, videoSource);
+                    tracks[1] = getUserAudio(constraints); /*!!!*/
+
 
                     ConstraintsArray audioTracks = new ConstraintsArray();
                     ConstraintsArray videoTracks = new ConstraintsArray();

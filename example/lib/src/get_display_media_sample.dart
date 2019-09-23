@@ -48,7 +48,7 @@ class _GetDisplayMediaSampleState extends State<GetDisplayMediaSample> {
   // Platform messages are asynchronous, so we initialize in an async method.
   _makeCall() async {
     final Map<String, dynamic> mediaConstraints = {
-      "audio": false,
+      "audio": true,
       "video": true
     };
 
@@ -56,6 +56,7 @@ class _GetDisplayMediaSampleState extends State<GetDisplayMediaSample> {
       var stream = await navigator.getDisplayMedia(mediaConstraints);
       _localStream = stream;
       _localRenderer.srcObject = _localStream;
+      print("Audio length: ${stream.getAudioTracks().length}");
     } catch (e) {
       print(e.toString());
     }

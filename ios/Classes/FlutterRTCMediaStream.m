@@ -415,17 +415,42 @@ typedef void (^NavigatorUserMediaSuccessCallback)(RTCMediaStream *mediaStream);
     NSString *trackUUID = [[NSUUID UUID] UUIDString];
     RTCVideoTrack *videoTrack = [self.peerConnectionFactory videoTrackWithSource:videoSource trackId:trackUUID];
     [mediaStream addVideoTrack:videoTrack];
-    
-    NSMutableArray *audioTracks = [NSMutableArray array];
-    NSMutableArray *videoTracks = [NSMutableArray array];
 
-    for (RTCVideoTrack *track in mediaStream.videoTracks) {
-        [self.localTracks setObject:track forKey:track.trackId];
-        [videoTracks addObject:@{@"id": track.trackId, @"kind": track.kind, @"label": track.trackId, @"enabled": @(track.isEnabled), @"remote": @(YES), @"readyState": @"live"}];
-    }
-    
-    self.localStreams[mediaStreamId] = mediaStream;
-    result(@{@"streamId": mediaStreamId, @"audioTracks" : audioTracks, @"videoTracks" : videoTracks });
+    [AVCaptureDevice
+      requestAccessForMediaType:AVMediaTypeAudio
+      completionHandler:^ (BOOL granted) {
+          dispatch_async(dispatch_get_main_queue(), ^ {
+              if (granted) {
+                NSString *trackUUID2 = [[NSUUID UUID] UUIDString];
+                RTCAudioTrack *audioTrack = [self.peerConnectionFactory audioTrackWithTrackId:trackUUID2];
+                [mediaStream addAudioTrack:audioTrack];
+                NSMutableArray *audioTracks = [NSMutableArray array];
+                NSMutableArray *videoTracks = [NSMutableArray array];
+
+                for (RTCVideoTrack *track in mediaStream.videoTracks) {
+                    [self.localTracks setObject:track forKey:track.trackId];
+                    [videoTracks addObject:@{@"id": track.trackId, @"kind": track.kind, @"label": track.trackId, @"enabled": @(track.isEnabled), @"remote": @(YES), @"readyState": @"live"}];
+                }
+
+                for (RTCAudioTrack *track in mediaStream.audioTracks) {
+                    [self.localTracks setObject:track forKey:track.trackId];
+                    [audioTracks addObject:@{@"id": track.trackId, @"kind": track.kind, @"label": track.trackId, @"enabled": @(track.isEnabled), @"remote": @(YES), @"readyState": @"live"}];
+                }
+
+                self.localStreams[mediaStreamId] = mediaStream;
+                result(@{@"streamId": mediaStreamId, @"audioTracks" : audioTracks, @"videoTracks" : videoTracks });
+
+              } else {
+                  // According to step 10 Permission Failure of the getUserMedia()
+                  // algorithm, if the user has denied permission, fail "with a new
+                  // DOMException object whose name attribute has the value
+                  // NotAllowedError."
+                  result([FlutterError errorWithCode:[NSString stringWithFormat:@"Error %@", @"DOMException"]
+                               message:@"NotAllowedError"
+                               details:nil]);
+              }
+          });
+      }];
 }
 
 -(void)getSources:(FlutterResult)result{

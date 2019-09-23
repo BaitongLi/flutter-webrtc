@@ -17,7 +17,7 @@ A new flutter plugin project.
   s.dependency 'Flutter'
   s.dependency 'libyuv-iOS'
   s.dependency 'GoogleWebRTC', '1.1.27299'
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '12.1'
   s.static_framework = true
 end
 
