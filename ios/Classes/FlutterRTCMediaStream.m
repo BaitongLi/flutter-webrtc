@@ -421,6 +421,7 @@ typedef void (^NavigatorUserMediaSuccessCallback)(RTCMediaStream *mediaStream);
       completionHandler:^ (BOOL granted) {
           dispatch_async(dispatch_get_main_queue(), ^ {
               if (granted) {
+                NSLog(@"granted!");
                 NSString *trackUUID2 = [[NSUUID UUID] UUIDString];
                 RTCAudioTrack *audioTrack = [self.peerConnectionFactory audioTrackWithTrackId:trackUUID2];
                 [mediaStream addAudioTrack:audioTrack];
@@ -441,6 +442,7 @@ typedef void (^NavigatorUserMediaSuccessCallback)(RTCMediaStream *mediaStream);
                 result(@{@"streamId": mediaStreamId, @"audioTracks" : audioTracks, @"videoTracks" : videoTracks });
 
               } else {
+                  NSLog(@"Not Granted!");
                   // According to step 10 Permission Failure of the getUserMedia()
                   // algorithm, if the user has denied permission, fail "with a new
                   // DOMException object whose name attribute has the value
@@ -450,7 +452,8 @@ typedef void (^NavigatorUserMediaSuccessCallback)(RTCMediaStream *mediaStream);
                                details:nil]);
               }
           });
-      }];
+      }
+    ];
 }
 
 -(void)getSources:(FlutterResult)result{

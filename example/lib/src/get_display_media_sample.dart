@@ -57,6 +57,7 @@ class _GetDisplayMediaSampleState extends State<GetDisplayMediaSample> {
       _localStream = stream;
       _localRenderer.srcObject = _localStream;
       print("Audio length: ${stream.getAudioTracks().length}");
+      print("Video length: ${stream.getVideoTracks().length}");
     } catch (e) {
       print(e.toString());
     }
@@ -66,7 +67,7 @@ class _GetDisplayMediaSampleState extends State<GetDisplayMediaSample> {
       _inCalling = true;
     });
 
-    _timer = new Timer.periodic(Duration(milliseconds: 100), handleTimer);
+    _timer = new Timer.periodic(Duration(seconds: 2), handleTimer);
   }
 
   _hangUp() async {

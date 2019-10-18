@@ -21,6 +21,7 @@ class _GetUserMediaSampleState extends State<GetUserMediaSample> {
   bool _inCalling = false;
   MediaRecorder _mediaRecorder;
   get _isRec => _mediaRecorder != null;
+  bool _isMuted = false;
 
   @override
   initState() {
@@ -136,6 +137,22 @@ class _GetUserMediaSampleState extends State<GetUserMediaSample> {
                 new IconButton(
                   icon: Icon(_isRec ? Icons.stop : Icons.fiber_manual_record),
                   onPressed: _isRec ? _stopRecording : _startRecording,
+                ),
+                new IconButton(
+                    icon: Icon(_isMuted ? Icons.mic_off : Icons.mic),
+                    onPressed: () {
+                      if(_isMuted) {
+                        _localStream.getAudioTracks()[0].setVolume(1.0);
+                        setState(() {
+                          _isMuted = false;
+                        });
+                      } else {
+                        _localStream.getAudioTracks()[0].setVolume(0.0);
+                        setState(() {
+                          _isMuted = true;
+                        });
+                      }
+                    },
                 ),
               ]
             : null,
